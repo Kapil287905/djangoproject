@@ -1,11 +1,17 @@
+{% extends 'base.html' %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    {% block title %}Home{% endblock %}
 </head>
 <body>
+    {% comment %}
+    {% include 'header.html' %}
+    {% endcomment %}
+    {% block body %}
     <center>
         <h1>Welcome to django</h1>
         {% comment %}
@@ -67,5 +73,9 @@
             </tbody>
          </table>  
     </center>
+    {% endblock %}
+    {% comment %}
+    {% include 'footer.html' %}
+    {% endcomment %}    
 </body>
 </html>

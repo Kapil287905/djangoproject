@@ -1,0 +1,10 @@
+*{
+    background-color: cyan;
+}
+footer{
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+}
