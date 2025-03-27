@@ -13,13 +13,12 @@
     {% endcomment %}
     {% block body %}
     <center>
-        <h1>Welcome to django</h1>
+        <h1>Welcome to MyBookstore</h1>
         {% comment %}
         <h5>You login at <i>{{curdate}}</i></h5>
         
-                Good Morning  {{myname}}
-                
-        {% endcomment %}
+                Good Morning  {{myname}}                
+       
         <h3>
             <mark>                                
                 <!-- DTL if else -->
@@ -37,10 +36,11 @@
                  {% endwith %}                
             </mark>
         </h3>
+        {% endcomment %}
         <hr>
         <!-- showing Book data -->
          <h1>Books Details</h1>
-         <table border="1px" cellspacing="4px" cellpadding="8px">
+         <table class="table table-bordered table-striped" >
             <thead>
                 <th>Sr.no</th>
                 <th>ISBN</th>
