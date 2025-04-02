@@ -28,7 +28,8 @@
                       <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{% url 'dashboard'%}">Home</a>
                       </li>
-                      <li class="nav-item">
+                      <li class="nav-item"><p class="nav-link">welcome {{user}}</p></li>
+                      <li class="nav-item">                        
                         <a class="nav-link active" aria-current="page" href="{% url 'userlogout'%}">Logout</a>
                       </li>
                       {% else %}

@@ -66,8 +66,15 @@ def singin(req):
 def dashboard(req):
     print(req.user)
     username = req.user
-    return render(req, "dashboard.html",{"username": username})
+    allpets=Pet.objects.all()
+    print(allpets)
+    return render(req, "dashboard.html",{"username": username,"allpets":allpets})
 
 def userlogout(req):
     logout(req)
     return redirect('/')
+
+def petdetail(req,petid):
+    petdata=Pet.objects.get(petid=petid)
+    context={'petdata':petdata}
+    return render(req, "petdetail.html",context)
