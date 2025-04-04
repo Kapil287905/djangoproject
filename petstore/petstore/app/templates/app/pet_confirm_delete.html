@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}PetDelete{% endblock %} 
+{% block body %}
+<div class="container">
+    <div class="row">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <img src="{{object.photo.url}}" class="card-img-top" alt="{{x.petname}}"  style="width:400px; height:300px" width="400px" height="300px">
+            <h3>Are you sure want to delete {{object.petname}}</h3>
+            <br>
+            <input type="submit" value="Confirm">
+            <a href="/dashboard"><input type="button" value="Cancel"></a>
+        </form>
+
+
+    </div>
+</div>
+{% endblock %}   
