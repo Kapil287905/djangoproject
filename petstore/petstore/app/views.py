@@ -8,6 +8,8 @@ from django.contrib.auth import authenticate, login, logout
 
 def index(req):
     allpets=Pet.objects.all()
+    # petdata=Pet.objects.filter(petname="Rocky")
+    # print(petdata)
     return render(req,"index.html", {"allpets":allpets}) 
 
 
@@ -98,8 +100,29 @@ class PetDelete(DeleteView):
     model = Pet
     success_url = "/dashboard"
 
+from django.contrib import messages
+from django.db.models import Q
+def searchpets(req):
+    query=req.GET["q"]
+    print(query)
+    allpets = Pet.objects.filter(Q(petname__icontains=query) | Q(description__icontains=query))
+    print(allpets,len(allpets))
+    if len(allpets) == 0:
+        messages.error(req, "No result found!!")
+    context = {"allpets": allpets}
+    if req.user.is_authenticated:
+        return render(req, "dashboard.html", context)
+    else:
+        return render(req, "index.html", context)
 
-
+def searchbygender(req,gender):
+    gender=req.GET["gender"]
+    print(gender)
+    allpets = Pet.objects.filter(gender__exact=gender)
+    if req.user.is_authenticated:
+        return render(req, "dashboard.html")
+    else:
+        return render(req, "index.html")
 
 
 

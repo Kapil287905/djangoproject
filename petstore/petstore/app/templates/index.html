@@ -3,6 +3,13 @@
 {% block title %}Petstore | Home{% endblock %}    
     {% block body %}
     <center> 
+        <div class="container">
+            <div class="row">
+                <h2>Search By gender</h2>
+                <a herf="{% url 'searchbygender' %}" name="gender">Male</a>
+                <a herf="{% url 'searchbygender' %}" name="gender">Female</a>
+            </div>
+        </div>
         <!-- carousel -->
         <div class="container">
             <div class="row">
@@ -33,6 +40,9 @@
          <h3>Pets Details</h3>         
         <div class="container mt-3">
             <div class="row">
+                {% for m in messages %}
+                    <h1><mark>{{m}}</mark></h1>
+                {% endfor %}
                 {% for x in allpets %}
                 <div class="col-md-3">
                     <div class="card">
