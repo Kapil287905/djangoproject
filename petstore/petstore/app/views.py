@@ -12,6 +12,41 @@ def index(req):
     # print(petdata)
     return render(req,"index.html", {"allpets":allpets}) 
 
+from django.core.exceptions import ValidationError
+
+def validate_password(password):
+    if len(password) < 8 and len(password) > 128:
+        raise ValidationError("Password must be atleast long and less than 128")
+    has_upper=False
+    has_lower=False
+    has_digit=False
+    has_special=False
+    specialchars="@$!%?&"
+
+    for char in password:
+        if char.isupper():
+            has_upper = True
+        elif char.islower():
+            has_lower = True
+        elif char.isdigit():
+            has_digit = True
+        elif char in specialchars:
+            has_special = True
+
+
+    if not has_upper:
+        raise ValidationError("Password must contain atleast one uppercase letter")
+    elif not has_lower:
+            raise ValidationError("Password must contain atleast one upperlowercase letter")
+    if not has_digit:
+            raise ValidationError("Password must contain atleast one digit letter")
+    if not has_special:
+            raise ValidationError("Password must contain atleast one special char (e.g. @$!%?&)")
+    
+    commonpassword=["password","123456","qwerty","abc123"]
+    if password in commonpassword:
+        raise ValidationError("This password is too common.please chose another one.")
+
 
 def singup(req):    
     if req.method == "GET":
@@ -24,6 +59,12 @@ def singup(req):
         upass=req.POST["upass"]
         ucpass=req.POST["ucpass"]
         print(uname,upass,ucpass,uemail)
+        context = {}
+        try:
+            validate_password(upass)
+        except ValidationError as e:
+            context["errmsg"] = str(e)
+            return render(req,"singup.html",context) 
         if upass != ucpass:
             errmsg="Password and Confirm password nust be same"
             context = {"errmsg":errmsg}
@@ -115,14 +156,49 @@ def searchpets(req):
     else:
         return render(req, "index.html", context)
 
-def searchbygender(req,gender):
+def searchbygender(req):
     gender=req.GET["gender"]
-    print(gender)
-    allpets = Pet.objects.filter(gender__exact=gender)
-    if req.user.is_authenticated:
-        return render(req, "dashboard.html")
+    if gender=="male":
+        allpets = Pet.objects.filter(gender__exact="Male")
     else:
-        return render(req, "index.html")
+        allpets = Pet.objects.filter(gender__exact="Female")
+    context = {"allpets":allpets}
+    print(allpets)
+    if req.user.is_authenticated:
+        return render(req, "dashboard.html", context)
+    else:
+        return render(req, "index.html", context)
 
-
-
+def req_password(req):
+    if req.method == "POST":
+        uemail = req.POST["uemail"]
+        try:
+            user = User.objects.get(email=uemail)
+            # return render(req,"reset_password.html",{"uemail":user.email})
+            return redirect("reset_password",uemail=user.email)
+        except User.DoesNotExist:
+            messages.error(req,"No account found with this email")
+            return render(req, "reqpassword.html")
+    else:
+        return render(req, "reqpassword.html")
+    
+def reset_password(req,uemail):
+    user = User.objects.get(email=uemail)
+    if req.method == "POST":
+        upass=req.POST["upass"]
+        ucpass=req.POST["ucpass"]
+        context = {}
+        try:
+            validate_password(upass)
+        except ValidationError as e:
+            context["errmsg"] = str(e)
+            return render(req,"singup.html",context) 
+        if upass != ucpass:
+            messages.error(req,"Confirm password and Password do not match")
+            return render(req,"reset_password.html",{"uemail":uemail})
+        else:
+            user.set_password(upass)
+            user.save()
+            return redirect("singin")
+    else:
+        return render(req,"reset_password.html",{"uemail":uemail})
