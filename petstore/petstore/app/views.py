@@ -15,7 +15,7 @@ def index(req):
 from django.core.exceptions import ValidationError
 
 def validate_password(password):
-    if len(password) < 8 and len(password) > 128:
+    if len(password) < 8 or len(password) > 128:
         raise ValidationError("Password must be atleast long and less than 128")
     has_upper=False
     has_lower=False
@@ -33,11 +33,15 @@ def validate_password(password):
         elif char in specialchars:
             has_special = True
 
+    print(has_upper)
+    print(has_lower)
+    print(has_digit)
+    print(has_special)
 
     if not has_upper:
         raise ValidationError("Password must contain atleast one uppercase letter")
     elif not has_lower:
-            raise ValidationError("Password must contain atleast one upperlowercase letter")
+            raise ValidationError("Password must contain atleast one lowercase letter")
     if not has_digit:
             raise ValidationError("Password must contain atleast one digit letter")
     if not has_special:
@@ -169,12 +173,23 @@ def searchbygender(req):
     else:
         return render(req, "index.html", context)
 
+from django.core.mail import send_mail
+from django.conf import settings
+import random
+
 def req_password(req):
     if req.method == "POST":
         uemail = req.POST["uemail"]
         try:
             user = User.objects.get(email=uemail)
-            # return render(req,"reset_password.html",{"uemail":user.email})
+            print(user.email,user)
+            userotp = random.randint(1111,999999)
+            req.session["otp"] = userotp
+            subject = "Petstore OTP for Reset Password"
+            msg=f"Hello,{user}\n  Your OTP to reset password is:{userotp}\n Thank Ypu for using our services"
+            emailform = settings.EMAIL_HOST_USER
+            receiver = [user.email]
+            send_mail(subject,msg,emailform,receiver)
             return redirect("reset_password",uemail=user.email)
         except User.DoesNotExist:
             messages.error(req,"No account found with this email")
@@ -185,20 +200,26 @@ def req_password(req):
 def reset_password(req,uemail):
     user = User.objects.get(email=uemail)
     if req.method == "POST":
+        otp_entered = req.POST["uotp"]
         upass=req.POST["upass"]
-        ucpass=req.POST["ucpass"]
-        context = {}
-        try:
-            validate_password(upass)
-        except ValidationError as e:
-            context["errmsg"] = str(e)
-            return render(req,"singup.html",context) 
-        if upass != ucpass:
+        ucpass=req.POST["ucpass"] 
+        userotp = req.session.get("otp")  
+        print(userotp)
+        print(otp_entered,upass,ucpass) 
+        if int(otp_entered) != int(userotp):
+            messages.error(req, "OTP dose not match! Try again")
+            return render(req,"reset_password.html",{"uemail":uemail})      
+        elif upass != ucpass:
             messages.error(req,"Confirm password and Password do not match")
             return render(req,"reset_password.html",{"uemail":uemail})
         else:
-            user.set_password(upass)
-            user.save()
-            return redirect("singin")
+            try:
+                validate_password(upass)
+                user.set_password(upass)
+                user.save()
+                return redirect("singin")
+            except ValidationError as e:
+                messages.error(req,str(e))
+                return render(req,"reset_password.html",{"uemail":uemail})            
     else:
         return render(req,"reset_password.html",{"uemail":uemail})
