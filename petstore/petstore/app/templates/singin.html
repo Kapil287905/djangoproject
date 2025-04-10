@@ -30,6 +30,11 @@
               <label class="form-check-label" for="exampleCheck1">Check me out</label>
             </div>
             <div class="mb-3 form-check">
+              <p>
+                Signin with <a href="{% url 'social:begin' 'google-oauth2' %}"><i class="bi bi-google"></i></a>
+              </p>
+            </div>
+            <div class="mb-3 form-check">
               <a href="{% url 'req_password' %}">forgot password</a>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>

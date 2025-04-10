@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app'
+    'app',
+    "social_django"
 ]
 
 MIDDLEWARE = [
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'petstore.urls'
@@ -63,6 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
             ],
         },
     },
@@ -135,3 +138,17 @@ EMAIL_USE_TLS = True
 EMAIL_POST = 587
 EMAIL_HOST_USER = "kmeghnani28@gmail.com"
 EMAIL_HOST_PASSWORD = "lrkh zkmm rajm xlbx"
+
+# Google Social login
+AUTHENTICATION_BACKENDS=[
+    "social_core.backends.google.GoogleOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_URL = "logout"
+LOGOUT_REDIRECT_URL = "/"
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "62349978253-81kjgh7a6u7rnt2djuc29icp0ei667sm.apps.googleusercontent.com"
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "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"
