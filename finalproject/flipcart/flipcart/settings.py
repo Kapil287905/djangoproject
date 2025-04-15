@@ -73,23 +73,23 @@ WSGI_APPLICATION = 'flipcart.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.mysql',
-		'NAME': 'flipkart418',
-		'USER': 'root',
-		'PASSWORD': '',
-		'HOST':'localhost',
-		'PORT':'3306',
-	}
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+# DATABASES = {
+# 	'default': {
+# 		'ENGINE': 'django.db.backends.mysql',
+# 		'NAME': 'flipkart418',
+# 		'USER': 'root',
+# 		'PASSWORD': '',
+# 		'HOST':'localhost',
+# 		'PORT':'3306',
+# 	}
+# }
 
 
 
@@ -137,3 +137,26 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# # gmail mail configuration
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_POST = 587
+EMAIL_HOST_USER = "kmeghnani28@gmail.com"
+EMAIL_HOST_PASSWORD = "lrkh zkmm rajm xlbx"
+
+# # Google Social login
+# AUTHENTICATION_BACKENDS=[
+#     "social_core.backends.google.GoogleOAuth2",
+#     "django.contrib.auth.backends.ModelBackend",
+# ]
+
+# LOGIN_URL = "login"
+# LOGIN_REDIRECT_URL = "/"
+# LOGOUT_URL = "logout"
+# LOGOUT_REDIRECT_URL = "/"
+
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "62349978253-81kjgh7a6u7rnt2djuc29icp0ei667sm.apps.googleusercontent.com"
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "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"
