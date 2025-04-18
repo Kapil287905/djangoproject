@@ -1,10 +1,19 @@
-from django.shortcuts import render,redirect
-from .models import UserDetail,Products,Carts,Orders,Payments
+from django.shortcuts import render, redirect
+from .models import UserProfile, Products, Carts, Orders, Payments, Categories
 from django.contrib.auth.models import User
 
 # Create your views here.
+
+
 def index(req):
-    return render(req,"index.html") 
+    allproducts = Products.objects.all()
+    print(allproducts)
+    allcategories = Categories.objects.all()
+    print(allcategories)
+    return render(
+        req, "index.html", {"allproducts": allproducts, "allcategories": allcategories}
+    )
+
 
 from django.core.exceptions import ValidationError
 
@@ -115,9 +124,11 @@ def signin(req):
             context["errmsg"] = "Invalid email or password"
             return render(req, "signin.html", context)
 
+
 def userlogout(req):
     logout(req)
     return redirect("/")
+
 
 from django.core.mail import send_mail
 from django.conf import settings
@@ -183,7 +194,8 @@ def reset_password(req, uemail):
 
 
 def about(req):
-    return render(req,"about.html")
+    return render(req, "about.html")
+
 
 def contact(req):
     if req.method == "POST":
@@ -191,13 +203,34 @@ def contact(req):
         umobile = req.POST["umobile"]
         uemail = req.POST["uemail"]
         msg = req.POST["msg"]
-        print(uname,umobile,uemail,msg)
+        print(uname, umobile, uemail, msg)
+
         subject = "My Query"
-        msg = f"Hello Team, {msg}"
+        msg = f"Hello Team, {msg}."
         emailfrom = settings.EMAIL_HOST_USER
         receiver = [uemail]
         send_mail(subject, msg, emailfrom, receiver)
-        
+
         return redirect("/")
     else:
-        return render(req,"contact.html")
+        return render(req, "contact.html")
+
+
+from django.contrib import messages
+from django.db.models import Q
+
+
+def searchproduct(req):
+    query=req.GET["q"]
+    if query:
+        allproducts=Products.objects.filter(
+            Q(productname__icontains=query)
+            |Q(description__icontains=query)
+        )
+        if len(allproducts)==0:
+            messages.error(req,"No result found!!")
+    else:
+        allproducts=Products.objects.all()
+
+    context={'allproducts':allproducts}
+    return render(req, "index.html",context)
