@@ -234,3 +234,71 @@ def searchproduct(req):
 
     context={'allproducts':allproducts}
     return render(req, "index.html",context)
+
+def electronics_search(req):
+    if req.method=="GET":
+        # ele_category=Categories.objects.filter(name="Electronics").first()
+        # ele_category=Categories.objects.get(name="Electronics") # (=) for single row
+        # print(ele_category)
+        # allproducts = Products.objects.filter(categories=ele_category) # many row
+        # print(allproducts)
+        # context={'allproducts':allproducts}
+        # if len(allproducts)==0:
+        #     messages.error(req,"No result found!!")
+        # return render(req, "index.html",context)
+
+        allproducts=Products.Productmanager.electronics_list()
+        print(allproducts)
+        allcategories = Categories.objects.all()
+        print(allcategories)
+        context={'allproducts':allproducts, "allcategories": allcategories}
+        if len(allproducts)==0:
+            messages.error(req,"No result found!!")
+        return render(req, "index.html",context)
+    
+def cloths_search(req):
+    if req.method=="GET":
+        allproducts=Products.Productmanager.cloths_list()
+        print(allproducts)
+        allcategories = Categories.objects.all()
+        print(allcategories)
+        context={'allproducts':allproducts, "allcategories": allcategories}
+        if len(allproducts)==0:
+            messages.error(req,"No result found!!")
+        return render(req, "index.html",context)
+    
+def shoes_search(req):
+    if req.method=="GET":
+        allproducts=Products.Productmanager.shoes_list()
+        print(allproducts)
+        allcategories = Categories.objects.all()
+        print(allcategories)
+        context={'allproducts':allproducts, "allcategories": allcategories}
+        if len(allproducts)==0:
+            messages.error(req,"No result found!!")
+        return render(req, "index.html",context)
+    
+def searchby_pricerange(req):
+    if req.method == "GET":
+        allcategories = Categories.objects.all()
+        print(allcategories)
+        context={"allcategories": allcategories}
+        return render(req, "index.html",context)
+    else:
+        r1 = req.POST["min"]
+        r2 = req.POST["max"]
+        print(r1,r2)
+        if r1 is not None and r2 is not None and r1.isdigit() and r2.isdigit():
+            # allproducts = Products.objects.filter(price__range(r1,r2))
+            allproducts = Products.Productmanager.pricerange(r1,r2)
+            allcategories = Categories.objects.all()
+            print(allcategories)
+            context={'allproducts':allproducts, "allcategories": allcategories}
+            if len(allproducts)==0:
+                messages.error(req,"No result found!!")
+            return render(req, "index.html",context)
+        else:
+            allproducts = Products.objects.all()
+            allcategories = Categories.objects.all()
+            context={'allproducts':allproducts, "allcategories": allcategories}
+            return render(req, "index.html",context)

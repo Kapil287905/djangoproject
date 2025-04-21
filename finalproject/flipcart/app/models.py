@@ -2,6 +2,18 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+class CustomManager(models.Manager):
+    def electronics_list(self):
+        ele_category=Categories.objects.get(name="Electronics")
+        return self.filter(categories__exact=ele_category)
+    def cloths_list(self):
+        cloth_category = Categories.objects.get(name="Cloths")
+        return self.filter(categories__exact=cloth_category)
+    def shoes_list(self):
+        shoe_category = Categories.objects.get(name="Shoes")
+        return self.filter(categories__exact=shoe_category)
+    def pricerange(self,r1,r2):
+        return self.filter(price__range=(r1,r2))
 
 class UserProfile(models.Model):
     userid = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, default=None)
@@ -45,6 +57,8 @@ class Products(models.Model):
     price = models.FloatField()
     quantity_available = models.PositiveIntegerField(default=0)
     images = models.ImageField(upload_to="images")
+    objects = models.Manager()
+    Productmanager = CustomManager()
 
     def __str__(self):
         return self.productname

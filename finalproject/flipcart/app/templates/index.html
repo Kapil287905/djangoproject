@@ -1,5 +1,7 @@
-{% extends 'base.html' %} {% load static %} {% block title %}Filpkart|Index 
-{% endblock %} {% block body %}
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Filpkart|Index {% endblock %} 
+{% block body %}
 
 <!-- categories -->
 <div class="container-fluid">
@@ -9,8 +11,9 @@
         src="{% static 'images/appliances.png' %}"
         width="80px"
         height="70px"
+        alt=""
       />
-      <p><a href="#">Appliances</a></p>
+      <p><a href="{% url 'electronics_search' %}">Appliances</a></p>
     </div>
 
     <div class="col">
@@ -18,18 +21,19 @@
         src="{% static 'images/babyproducts.png' %}"
         width="80px"
         height="70px"
+        alt=""
       />
       <p><a href="#">Baby Products</a></p>
     </div>
 
     <div class="col">
-      <img src="{% static 'images/beauty.png' %}" width="80px" height="70px" />
+      <img src="{% static 'images/beauty.png' %}" width="80px" height="70px" alt="" />
       <p><a href="#">Beauty Products</a></p>
     </div>
 
     <div class="col">
-      <img src="{% static 'images/fashion.png' %}" width="80px" height="70px" />
-      <p><a href="#">Fashion</a></p>
+      <img src="{% static 'images/fashion.png' %}" width="80px" height="70px" alt="" />
+      <p><a href="{% url 'cloths_search' %}">Fashion</a></p>
     </div>
 
     <div class="col">
@@ -37,22 +41,23 @@
         src="{% static 'images/furniture.png' %}"
         width="80px"
         height="70px"
+        alt=""
       />
       <p><a href="#">Furniture</a></p>
     </div>
 
     <div class="col">
-      <img src="{% static 'images/grocery.png' %}" width="80px" height="70px" />
+      <img src="{% static 'images/grocery.png' %}" width="80px" height="70px" alt="" />
       <p><a href="#">Grocery</a></p>
     </div>
 
     <div class="col">
-      <img src="{% static 'images/kitchen.png' %}" width="80px" height="70px" />
+      <img src="{% static 'images/kitchen.png' %}" width="80px" height="70px" alt="" />
       <p><a href="#">Kitchen</a></p>
     </div>
 
     <div class="col">
-      <img src="{% static 'images/travel.png' %}" width="80px" height="70px" />
+      <img src="{% static 'images/travel.png' %}" width="80px" height="70px" alt="" />
       <p><a href="#">Travel</a></p>
     </div>
   </div>
@@ -72,7 +77,15 @@
           </button>
           <ul class="dropdown-menu">
             {% for c in allcategories %}
+            {% if c.name == "Electronics" %}
+            <li><a class="dropdown-item" href="{% url 'electronics_search' %}">{{c.name}}</a></li>
+            {% elif c.name == "Cloths" %}
+            <li><a class="dropdown-item" href="{% url 'cloths_search' %}">{{c.name}}</a></li>
+            {% elif c.name == "Shoes" %}
+            <li><a class="dropdown-item" href="{% url 'shoes_search' %}">{{c.name}}</a></li>
+            {% else %}
             <li><a class="dropdown-item" href="#">{{c.name}}</a></li>
+            {% endif %}
             {% endfor %}
 
           </ul>
@@ -82,10 +95,10 @@
       <div class="mt-3">
         <h5>Search By Price Range</h5>
         <hr>
-        <form>
+        <form method="post" action="{% url 'searchby_pricerange' %}">
           {% csrf_token %}
-          <input class="form-control" type="number" name="min" placeholder="Min Price"><br>
-          <input class="form-control" type="number" name="max" placeholder="Max Price"><br>
+          <input class="form-control" type="number" name="min" placeholder="Min Price" required><br>
+          <input class="form-control" type="number" name="max" placeholder="Max Price" required><br>
           <input type="submit" class="btn btn-danger" value="Submit">
         </form>
       </div>
