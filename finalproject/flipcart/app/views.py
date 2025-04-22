@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from .models import UserProfile, Products, Carts, Orders, Payments, Categories
+from django.shortcuts import render, redirect,get_object_or_404
+from .models import UserProfile, Products, Carts, Orders, Payments, Categories,Wishlist,Address
 from django.contrib.auth.models import User
 
 # Create your views here.
@@ -118,7 +118,7 @@ def signin(req):
         if userdata is not None:
             login(req, userdata)
             # return render(req, "dashboard.html")
-            return redirect("dashboard")
+            return redirect("/")
         else:
             context = {}
             context["errmsg"] = "Invalid email or password"
@@ -302,3 +302,52 @@ def searchby_pricerange(req):
             allcategories = Categories.objects.all()
             context={'allproducts':allproducts, "allcategories": allcategories}
             return render(req, "index.html",context)
+        
+def sortingbyprice(req):
+    sortoption=req.GET["sort"]
+    if sortoption=="low_to_high":
+        allproducts=Products.objects.order_by("price")
+    elif sortoption=="high_to_low":
+        allproducts=Products.objects.order_by("-price")
+    else:
+        allproducts = Products.objects.all()
+    
+    allcategories = Categories.objects.all()
+    context={'allproducts':allproducts, "allcategories": allcategories}
+    return render(req, "index.html",context)
+
+def productdetail(req,productid):
+    product=Products.objects.get(productid=productid)
+    context={"product":product}
+    return render(req, "productdetail.html",context)
+
+def showwishlist(req):
+    if req.user.is_authenticated:
+        userid=req.user
+        wishlist_item=Wishlist.objects.filter(userid=userid)
+        context={"wishlist_item":wishlist_item}
+        return render(req, "showwishlist.html", context)
+    else:
+        return redirect("signin")
+    
+def addtowishlist(req,productid):
+    if req.user.is_authenticated:
+        userid=req.user
+        product = get_object_or_404(Products,productid=productid)
+        if not Wishlist.objects.filter(userid=userid,productid=productid).exists():
+            Wishlist.objects.create(userid=userid,productid=product)
+            messages.success(req,'Product added to wishlist')
+        else:
+            messages.info(req,'Product already in wishlist')
+
+        return redirect("showwishlist")
+    else:
+        return redirect("signin")
+
+def deletetowishlist(req,productid):
+    if req.user.is_authenticated:
+        userid=req.user
+        Wishlist.objects.filter(userid=userid, productid=productid).delete()
+        messages.success(req, 'Product removed from wishlist')
+        return redirect("showwishlist")
+  
