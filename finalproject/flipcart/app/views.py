@@ -347,7 +347,52 @@ def addtowishlist(req,productid):
 def deletetowishlist(req,productid):
     if req.user.is_authenticated:
         userid=req.user
-        Wishlist.objects.filter(userid=userid, productid=productid).delete()
+        product = get_object_or_404(Products,productid=productid)
+        wshlist_item=Wishlist.objects.filter(userid=userid, productid=product)
+        wshlist_item.delete()
         messages.success(req, 'Product removed from wishlist')
         return redirect("showwishlist")
-  
+    else:
+        messages.error(req,"You need to log in to add items to your wishlist")
+        return redirect("signin")
+
+from django.utils import timezone
+from datetime import timedelta
+
+def showcart(req):
+    if req.user.is_authenticated:
+        userid=req.user
+        allcarts = Carts.objects.filter(userid=userid)
+
+        totalitems=allcarts.count()
+        # totalitems = sum(item.qty for item in allcarts)
+        totalamount=sum(x.productid.price * x.qty for x in allcarts)
+
+        has_profile=UserProfile.objects.filter(userid=userid).exists()
+        has_address= Address.objects.filter(userid=userid).exists()
+
+        estimated_delivery = timezone.now().date() + timedelta(days=5)
+
+        context={"allcarts": allcarts,"userid":userid,"totalitems":totalitems,"totalamount":totalamount,"has_profile":has_profile,"has_address":has_address,"estimated_delivery":estimated_delivery}
+        return render(req, "showcart.html", context)
+    else:
+        messages.error(req,"You need to log in to add items to your carts")
+        return redirect("signin")
+    
+def updateqty(req,qv,productid):
+    product = get_object_or_404(Products, productid=productid)
+    allcarts = Carts.objects.filter(userid=req.user, productid=product)
+    cart_item = allcarts.first()
+    if qv==1:
+        if cart_item.qty<product.quantity_available:
+            cart_item.qty += 1
+            cart_item.save()
+        else:
+            messages.error(req, 'Only limited stock available.')
+    else:
+        if cart_item.qty > 1:
+            cart_item.qty -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+    return redirect("showcart")

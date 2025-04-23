@@ -20,4 +20,6 @@ urlpatterns = [
     path("showwishlist/", views.showwishlist, name="showwishlist"),
     path("addtowishlist/<int:productid>/", views.addtowishlist, name="addtowishlist"),
     path("deletetowishlist/<int:productid>/", views.deletetowishlist, name="deletetowishlist"),
+    path("showcart/", views.showcart, name="showcart"),
+    path("updateqty/<int:qv>/<int:productid>/", views.updateqty, name="updateqty"),
 ]
