@@ -11,7 +11,7 @@
             <p>{{m}}</p>
         </div>
         {% endfor %}
-        <div class="col-md-9 mt-3 mt-3">
+        <div class="col-md-9 mt-3">
             {% for x in allcarts %}
             <div class="row">        
                 <div class="col-md-4 text-center">
@@ -35,6 +35,8 @@
                             <li>Bank offer 50% Unlimited cashback</li>
                             <li>No cost EMI 3,333/month.</li>
                         </ul>
+                        <p>Deliver by <strong>{{estimated_delivery}}</strong> | <span>Free</span></p>
+                        <p>10 Days Return Policy</p>
                         <h3 class="card-text fw-bold">
                             Available Quantity:{{x.productid.quantity_available}}
                         </h3>
@@ -51,23 +53,48 @@
                             {% endif %}
                         </p>         
 
-                        <a href="#" class="btn btn-primary">Checkout</a>
-                        <a href="#" class="btn btn-success">Remove</a>           
+                        {% if has_profile and has_address %}
+                        <a class="btn btn-warning" href="#">Proceed to checkout</a>
+                        {% else %}
+                        <button class="btn btn-secondary" disabled>checkout Unavaliable</button>
+                        {% endif %}
+                        <a href="{% url 'deletetocart' x.productid.productid %}" class="btn btn-success">Remove</a>
+                        <a href="/" class="btn btn-danger">Back</a>           
                     </div>
                 </div>        
             </div>
+            <hr>
             {% empty %}
             <div class="alert alert-info">
                 <p>Yout Cart is empty. Start adding ptoducts</p>
             </div>
             {% endfor %}
         </div>
-        <div class="col-md-3 mt-3 mt-3">
+        <div class="col-md-3 mt-3">
             <div class="card-header fw-bold">Total Summary</div>
             <div class="card-body">
                 <h5 class="card-title">Total Items:{{totalitems}}</h5>
                 <hr>
                 <h5 class="card-title">Total amount:{{totalamount}}</h5>
+                <hr>
+                <!-- checkout button -->
+                 {% if has_profile and has_address %}
+                 <a class="btn btn-warning" href="#">Proceed to checkout</a>
+                 {% else %}
+                 <button class="btn btn-secondary" disabled>checkout Unavaliable</button>
+                 {% endif %}
+
+                 {% if not has_profile %}
+                 <div class="alert alert-warning">
+                    Please <a href="{% url 'addprofile'%}">complete your profile</a> before checkout.
+                 </div>
+                 {% endif %}
+
+                 {% if not has_address %}
+                 <div class="alert alert-warning">
+                    Please <a href="{% url 'addaddress'%}">add your address</a> before checkout.
+                 </div>
+                 {% endif %}
             </div>
         </div>
     </div>

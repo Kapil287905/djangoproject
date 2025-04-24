@@ -22,4 +22,8 @@ urlpatterns = [
     path("deletetowishlist/<int:productid>/", views.deletetowishlist, name="deletetowishlist"),
     path("showcart/", views.showcart, name="showcart"),
     path("updateqty/<int:qv>/<int:productid>/", views.updateqty, name="updateqty"),
+    path("deletetocart/<int:productid>/", views.deletetocart, name="deletetocart"),
+    path("addtocart/<int:productid>/", views.addtocart, name="addtocart"),
+    path("addprofile/", views.addprofile, name="addprofile"),
+    path("addaddress/", views.addaddress, name="addaddress"),
 ]

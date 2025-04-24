@@ -396,3 +396,59 @@ def updateqty(req,qv,productid):
         else:
             cart_item.delete()
     return redirect("showcart")
+
+def deletetocart(req,productid):
+    if req.user.is_authenticated:
+        userid=req.user
+        product = get_object_or_404(Products,productid=productid)
+        cart_item=Carts.objects.filter(userid=userid, productid=product)
+        cart_item.delete()
+        messages.success(req, 'Product removed from cart')
+        return redirect("showcart")
+    else:
+        messages.error(req,"You need to log in to add items to your cart")
+        return redirect("signin")
+    
+def addtocart(req,productid):
+    if req.user.is_authenticated:
+        userid=req.user
+        product = get_object_or_404(Products,productid=productid)
+        cartitem,created=Carts.objects.get_or_create(userid=userid,productid=product)
+        new_qty=cartitem.qty+1 if not created else 1
+        if new_qty>product.quantity_available:
+            messages.error(req,'cannot add mare itmes-only limited stock available')
+            return redirect("showcart")
+        
+        cartitem.qty=new_qty
+        cartitem.save()
+        return redirect("showcart")
+
+    else:
+        messages.error(req,"You need to log in to add items to your carts")
+        return redirect("signin")
+    
+from .forms import UserProfileForm,AddressForm
+    
+def addprofile(req):
+    if req.method == "POST":
+        form=UserProfileForm(req.POST,req.FILES)
+        if form.is_valid():
+            profile=form.save(commit=False)
+            profile.userid=req.user
+            profile.save()
+            return redirect("showcart")
+    else:
+        form = UserProfileForm()
+    return render(req,'addprofile.html',{'form':form})
+
+def addaddress(req):
+    if req.method == "POST":
+        form=AddressForm(req.POST)
+        if form.is_valid():
+            address=form.save(commit=False)
+            address.userid=req.user
+            address.save()
+            return redirect("showcart")
+    else:
+        form = AddressForm()
+    return render(req,'addaddress.html',{'form':form})

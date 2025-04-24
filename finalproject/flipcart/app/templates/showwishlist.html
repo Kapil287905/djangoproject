@@ -34,13 +34,14 @@
                     <li>Bank offer 50% Unlimited cashback</li>
                     <li>No cost EMI 3,333/month.</li>
                 </ul>
-                <a href="{% url 'showcart' %}" class="btn btn-primary">Add to cart</a>
+                <a href="{% url 'addtocart'  product.productid.productid %}" class="btn btn-primary">Add to cart</a>
                 <a href="{% url 'deletetowishlist' product.productid.productid %}" class="btn btn-success">Remove</a>
                 <a href="/" class="btn btn-danger">Back</a>                
             </div>
 
         </div>        
     </div>
+    <hr>
     {% empty %}
     <div class="alert alert-info">
         <p>Yout wishlist is empty. Start adding ptoducts</p>

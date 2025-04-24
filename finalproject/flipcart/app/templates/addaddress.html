@@ -1,0 +1,33 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Filpkart|Add Address {% endblock %} 
+{% block body %}
+<div class="container">
+    <div class="row">
+        <h2 class="text-center">Add Your Address</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group mt-3">
+                <label>Enter Address</label>
+                {{form.address}}
+            </div>
+            <div class="form-group mt-3">
+                <label>Select City</label>
+                {{form.city}}
+            </div>
+            <div class="form-group mt-3">
+                <label>Select Country</label>
+                {{form.country}}
+            </div>
+            <div class="form-group mt-3">
+                <label>Enter Pincode</label>
+                {{form.pincode}}
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Save Profile</button>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
