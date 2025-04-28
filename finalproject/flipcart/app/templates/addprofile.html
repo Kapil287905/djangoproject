@@ -3,31 +3,38 @@
 {% block title %}Filpkart|Add Profile {% endblock %} 
 {% block body %}
 <div class="container">
-    <div class="row">
-        <h2 class="text-center">Complete Your Profile</h2>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group mt-3">
-                <label>Select Gender</label>
-                {{form.gender}}
-            </div>
-            <div class="form-group mt-3">
-                <label>Enter Date of Birth</label>
-                {{form.dob}}
-            </div>
-            <div class="form-group mt-3">
-                <label>Enter Contact Number</label>
-                {{form.mobile}}
-            </div>
-            <div class="form-group mt-3">
-                <label>Add Profile Photo</label>
-                {{form.photo}}
-            </div>
+    <h2 class="text-center">Create Your Profile</h2>
+    {% for m in messages %}
+        <div class="alert alter-denger">{{m}}</div>
+    {% endfor %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group mt-3">
+            <label for="mobile">Mobile</label>
+            <input type="number" name="mobile" id="mobile" class="form-control" required>
+        </div>
+        <div class="form-group mt-3">
+            <label for="gender">Gender</label>
+            <select name="gender" id="gender" class="form-control" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </div>
+        <div class="form-group mt-3">
+            <label for="dob">Date of Birth</label>
+            <input type="date" name="dob" id="dob" class="form-control" required>
+        </div>
+        <div class="form-group mt-3">
+            <label for="photo">Photo</label>
+            <input type="file" name="photo" id="photo" class="form-control" required>
+        </div>
 
-            <button type="submit" class="btn btn-primary mt-3">Save Profile</button>
-        </form>
+        <button type="submit" class="btn btn-primary mt-3">Create Profile</button>
+    </form>
 
-    </div>
+
 </div>
 
 {% endblock %}

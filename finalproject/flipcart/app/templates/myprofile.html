@@ -1,0 +1,32 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Filpkart|My Profile {% endblock %} 
+{% block body %}
+
+<div class="container mt-4">
+    <h2>My Profile</h2>
+    {% if userprofile %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>Name:</strong>{{userid}}</p>
+            <p><strong>Email:</strong>{{userid.email}}</p>
+            <p><strong>Mobile:</strong>{{userprofile.mobile}}</p>
+            <p><strong>Gender:</strong>{{userprofile.gender}}</p>
+            <p><strong>DOB:</strong>{{userprofile.dob|date:'Y-m-d'}}</p>
+            <img src="{{userprofile.photo.url}}" alt="{{userid}}" width="250" height="200">
+
+            <div class="mt-3">
+                <a href="{% url 'editprofile' userprofile.id %}" class="btn btn-primary">Edit Profile</a>
+                <a href="{% url 'deleteprofile' userprofile.id %}" class="btn btn-danger">Delete Profile</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alter-warning">
+        No profile found. Please <a href="{% url 'addprofile' %}">complate your profile</a>
+    </div>
+
+    {% endif %}
+</div>
+
+{% endblock %}

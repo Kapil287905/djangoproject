@@ -429,17 +429,73 @@ def addtocart(req,productid):
     
 from .forms import UserProfileForm,AddressForm
     
+# def addprofile(req):
+#     if req.method == "POST":
+#         form=UserProfileForm(req.POST,req.FILES)
+#         if form.is_valid():
+#             profile=form.save(commit=False)
+#             profile.userid=req.user
+#             profile.save()
+#             return redirect("showcart")
+#     else:
+#         form = UserProfileForm()
+#     return render(req,'addprofile.html',{'form':form})
+from datetime import datetime
 def addprofile(req):
-    if req.method == "POST":
-        form=UserProfileForm(req.POST,req.FILES)
-        if form.is_valid():
-            profile=form.save(commit=False)
-            profile.userid=req.user
-            profile.save()
-            return redirect("showcart")
+    user=req.user
+    if not user.is_authenticated:
+        return redirect("signin")
+    
+    if req.method=="POST":
+        mobile=req.POST["mobile"]
+        gender=req.POST["gender"]
+        dob=req.POST["dob"]
+        photo=req.FILES["photo"]
+
+        if dob:
+            dob_date=datetime.strptime(dob,"%Y-%m-%d").date()
+            today=timezone.now().date()
+            if dob_date>=today:
+                messages.error(req,"Date of birth cannot be todays or future date")
+
+            age=today.year-dob_date.year-((today.month,today.day)<(dob_date.month,dob_date.day)) 
+            print(age)
+
+            if age<18:
+                messages.error(req,"Ypu must ne at least 18 years old to create profile")
+                return render(req,'addprofile.html')
+            
+        UserProfile.objects.create(userid=user,mobile=mobile,gender=gender,dob=dob,photo=photo)
+        return redirect("myprofile")
     else:
-        form = UserProfileForm()
-    return render(req,'addprofile.html',{'form':form})
+        return render(req,'addprofile.html')
+
+def editprofile(req,profileid):
+    profile=get_object_or_404(UserProfile,id=profileid)
+    if req.method=="POST":
+        profile.mobile=req.POST["mobile"]
+        profile.gender=req.POST["gender"]
+        profile.dob=req.POST["dob"]
+        if req.FILES["photo"]:
+            profile.photo=req.FILES["photo"]
+        profile.save()
+        return redirect('myprofile')
+    return render(req,'editprofile.html',{'userprofile':profile})
+
+def deleteprofile(req,profileid):
+    profile=get_object_or_404(UserProfile,id=profileid)
+    profile.delete()
+    return redirect('myprofile')
+
+def myprofile(req):
+    user=req.user
+    if not user.is_authenticated:
+        return redirect("signin")
+    
+    userprofile=UserProfile.objects.filter(userid=user).first()
+    address=Address.objects.filter(userid=user)
+    context={"userid":user, "userprofile":userprofile,"address":address}
+    return render(req,"myprofile.html",context)
 
 def addaddress(req):
     if req.method == "POST":

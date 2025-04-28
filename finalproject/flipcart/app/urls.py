@@ -25,5 +25,8 @@ urlpatterns = [
     path("deletetocart/<int:productid>/", views.deletetocart, name="deletetocart"),
     path("addtocart/<int:productid>/", views.addtocart, name="addtocart"),
     path("addprofile/", views.addprofile, name="addprofile"),
+    path("myprofile/", views.myprofile, name="myprofile"),
+    path("editprofile/<int:profileid>/", views.editprofile, name="editprofile"),
+    path("deleteprofile/<int:profileid>/", views.deleteprofile, name="deleteprofile"),
     path("addaddress/", views.addaddress, name="addaddress"),
 ]

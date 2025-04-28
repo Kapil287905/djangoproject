@@ -1,0 +1,43 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Filpkart|Edit Profile {% endblock %} 
+{% block body %}
+<div class="container">
+    <h2 class="text-center">Edit Your Profile</h2>
+    {% for m in messages %}
+        <div class="alert alter-denger">{{m}}</div>
+    {% endfor %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group mt-3">
+            <label for="mobile">Mobile</label>
+            <input type="number" name="mobile" id="mobile" value="{{userprofile.mobile}}" class="form-control" required>
+        </div>
+        <div class="form-group mt-3">
+            <label for="gender">Gender</label>
+            <select name="gender" id="gender" class="form-control" required>
+                <option value="Male" {%if userprofile.gender == "Male" %}selected{% endif %}>Male</option>
+                <option value="Female" {%if userprofile.gender == "Female" %}selected{% endif %}>Female</option>
+            </select>
+        </div>
+        <div class="form-group mt-3">
+            <label for="dob">Date of Birth</label>
+            <input type="date" name="dob" id="dob" class="form-control" value="{{userprofile.dob|date:'Y-m-d'}}" required>
+        </div>
+        <div class="form-group mt-3">
+            <label for="photo">Photo</label>
+            <input type="file" name="photo" id="photo" class="form-control">
+            {% if userprofile.photo %}
+            <p>Current photo</p>
+            <img src="{{userprofile.photo.url}}" alt="{{userid}}" width="250" height="200" class="img-thumbnail">
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">save changes</button>
+    </form>
+
+
+</div>
+
+{% endblock %}
