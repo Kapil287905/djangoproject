@@ -29,4 +29,6 @@ urlpatterns = [
     path("editprofile/<int:profileid>/", views.editprofile, name="editprofile"),
     path("deleteprofile/<int:profileid>/", views.deleteprofile, name="deleteprofile"),
     path("addaddress/", views.addaddress, name="addaddress"),
+    path("deleteaddress/<int:addressid>/", views.deleteaddress, name="deleteaddress"),
+    path("editaddress/<int:addressid>/", views.editaddress, name="editaddress"),
 ]

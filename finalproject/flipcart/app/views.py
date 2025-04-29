@@ -497,14 +497,61 @@ def myprofile(req):
     context={"userid":user, "userprofile":userprofile,"address":address}
     return render(req,"myprofile.html",context)
 
+# def addaddress(req):
+#     if req.method == "POST":
+#         form=AddressForm(req.POST)
+#         if form.is_valid():
+#             address=form.save(commit=False)
+#             address.userid=req.user
+#             address.save()
+#             return redirect("showcart")
+#     else:
+#         form = AddressForm()
+#     return render(req,'addaddress.html',{'form':form})
+
+from .models import City,Country
+
 def addaddress(req):
-    if req.method == "POST":
-        form=AddressForm(req.POST)
-        if form.is_valid():
-            address=form.save(commit=False)
-            address.userid=req.user
-            address.save()
-            return redirect("showcart")
-    else:
-        form = AddressForm()
-    return render(req,'addaddress.html',{'form':form})
+    user=req.user
+    if not user.is_authenticated:
+        return redirect("signin")
+    
+    if req.method=="POST":
+         address=req.POST["address"]
+         city=req.POST["city"]
+         country=req.POST["country"]
+         pincode=req.POST["pincode"]
+         Address.objects.create(userid=user,address=address,city_id=city,country_id=country,pincode=pincode)
+         return redirect('myprofile')
+    
+    cities=City.objects.all()
+    countries=Country.objects.all()
+    context={'cities':cities,'countries':countries}
+    return render(req,'addaddress.html',context)
+
+def deleteaddress(req,addressid):
+    address=get_object_or_404(Address,id=addressid)
+    address.delete()
+    return redirect('myprofile')    
+
+def editaddress(req,addressid):
+    address=get_object_or_404(Address,id=addressid)
+    if req.method=="POST":
+        address.address=req.POST["address"]
+        city_id=req.POST["city"]
+        country_id=req.POST["country"]
+        address.pincode=req.POST["pincode"]
+
+        if city_id:
+            address.city_id=city_id
+
+        if country_id:
+            address.city_id=country_id
+
+        address.save()
+        return redirect('myprofile')
+    
+    cities=City.objects.all()
+    countries=Country.objects.all()
+    context={'address':address,'cities':cities,'countries':countries}
+    return render(req,'editaddress.html',context)
