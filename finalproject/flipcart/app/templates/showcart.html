@@ -54,7 +54,7 @@
                         </p>         
 
                         {% if has_profile and has_address %}
-                        <a class="btn btn-warning" href="#">Proceed to checkout</a>
+                        <a class="btn btn-warning" href="{% url 'checkoutsingle' x.productid.productid %}">Proceed to checkout</a>
                         {% else %}
                         <button class="btn btn-secondary" disabled>checkout Unavaliable</button>
                         {% endif %}
@@ -79,7 +79,7 @@
                 <hr>
                 <!-- checkout button -->
                  {% if has_profile and has_address %}
-                 <a class="btn btn-warning" href="#">Proceed to checkout</a>
+                 <a class="btn btn-warning" href="{% url 'checkout' %}">Proceed to checkout</a>
                  {% else %}
                  <button class="btn btn-secondary" disabled>checkout Unavaliable</button>
                  {% endif %}

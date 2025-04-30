@@ -1,0 +1,57 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Filpkart|Checkout {% endblock %} 
+{% block body %}
+<div class="container">
+    <h2 class="mb-3 text-center">Checkout</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h5>Customer Name: {{userid}}</h5>
+        <h5>Email: {{email}}</h5>
+            <h5>Mobile: {{mobile}}</h5>
+        {% for a in address %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <center>
+                    <input type="radio" name="address_id" value="{{a.id}}" required>
+                    <strong>Address {{forloop.counter}}:</strong>
+                </center>            
+                <p><Strong>Address: </Strong>{{a.address}}</p>
+                <p><Strong>City: </Strong>{{a.city.name}}</p>
+                <p><Strong>Country: </Strong>{{a.country.name}}</p>
+                <p><Strong>Pincode: </Strong>{{a.pincode}}</p>            
+            </div>
+        </div>
+        {% endfor %}
+
+    <h4 class="mt-4 mb-3">Card Summary</h4>
+    <table class="table table-bordered">
+        <thead>
+            <th>Sr.No</th>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+        </thead>
+        <tbody>
+            {% for c in cartdata %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                <td>{{c.productname}}</td>
+                <td>{{c.qty}}</td>
+                <td>₹{{c.price}}</td>
+                <td>₹{{c.subtotal}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4 class="text-right mt-3">Total:₹{{total}}</h4>
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-success">Place Order</button>
+        <a href="{% url 'showcart' %}" class="btn btn-danger">Cencel</a>
+    </div>
+    </form>
+</div>
+
+{% endblock %}

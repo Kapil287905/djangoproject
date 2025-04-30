@@ -31,4 +31,6 @@ urlpatterns = [
     path("addaddress/", views.addaddress, name="addaddress"),
     path("deleteaddress/<int:addressid>/", views.deleteaddress, name="deleteaddress"),
     path("editaddress/<int:addressid>/", views.editaddress, name="editaddress"),
+    path("checkout/", views.checkout, name="checkout"),
+    path("checkoutsingle/<int:productid>/", views.checkoutsingle, name="checkoutsingle"),
 ]

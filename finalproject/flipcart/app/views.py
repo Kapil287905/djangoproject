@@ -555,3 +555,71 @@ def editaddress(req,addressid):
     countries=Country.objects.all()
     context={'address':address,'cities':cities,'countries':countries}
     return render(req,'editaddress.html',context)
+
+def checkout(req):
+    if not req.user.is_authenticated:
+        return redirect("signin")
+    
+    cart_item=Carts.objects.filter(userid=req.user)
+    if not cart_item.exists():
+        return redirect('showcarts')
+    
+    cartdata=[]
+    total= 0
+    for item in cart_item:
+        subtotal=item.qty*item.productid.price
+        cartdata.append(
+            {
+                'productname':item.productid.productname,
+                'qty':item.qty,
+                'price': item.productid.price,
+                'subtotal':subtotal
+            }
+        )
+    
+        total+=subtotal
+
+    profile=UserProfile.objects.filter(userid=req.user).first()
+    return render(
+        req,
+        "checkout.html",
+        {
+            'cartdata':cartdata,
+            'profile':profile,
+            'address':Address.objects.filter(userid=req.user),
+            'total':total,
+            'mobile':profile.mobile,
+            'userid':req.user,
+            'email':req.user.email
+        },
+    )
+
+
+def checkoutsingle(req,productid):
+    user=req.user
+    address=Address.objects.filter(userid=req.user)
+    cartitem=Carts.objects.get(userid=user,productid__productid=productid)
+    cartdata=[
+        {
+            'productname':cartitem.productid.productname,
+            'qty':cartitem.qty,
+            'price': cartitem.productid.price,
+            'subtotal':cartitem.qty*cartitem.productid.price,
+        }
+    ]
+    total = cartdata[0]["subtotal"]
+
+    profile=UserProfile.objects.filter(userid=req.user).first()
+    return render(
+        req,
+        "checkout.html",
+        {
+            'cartdata':cartdata,
+            'profile':profile,
+            'address':address,
+            'total':total,
+            'mobile':profile.mobile,
+            'userid':req.user,
+            'email':req.user.email
+        },
+    )  
