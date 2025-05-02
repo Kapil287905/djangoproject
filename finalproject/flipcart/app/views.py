@@ -577,8 +577,9 @@ def checkout(req):
             }
         )
     
-        total+=subtotal
+        total+=subtotalp
 
+    req.session["total"] = total
     profile=UserProfile.objects.filter(userid=req.user).first()
     return render(
         req,
@@ -609,6 +610,7 @@ def checkoutsingle(req,productid):
     ]
     total = cartdata[0]["subtotal"]
 
+    req.session["total"] = total
     profile=UserProfile.objects.filter(userid=req.user).first()
     return render(
         req,
@@ -622,4 +624,12 @@ def checkoutsingle(req,productid):
             'userid':req.user,
             'email':req.user.email
         },
-    )  
+    )
+
+def placeorder(req):
+    user=req.user
+    profile=UserProfile.objects.filter(userid=req.user).first()
+    address=Address.objects.filter(userid=req.user)
+    print(address)
+    total=req.session['total']
+    return render(req,"payment.html",{"profile":profile,"address":address,"total":total})

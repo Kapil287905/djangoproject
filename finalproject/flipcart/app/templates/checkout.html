@@ -8,7 +8,7 @@
         {% csrf_token %}
         <h5>Customer Name: {{userid}}</h5>
         <h5>Email: {{email}}</h5>
-            <h5>Mobile: {{mobile}}</h5>
+        <h5>Mobile: {{mobile}}</h5>
         {% for a in address %}
         <div class="card mb-3">
             <div class="card-body">
@@ -48,7 +48,8 @@
 
     <h4 class="text-right mt-3">Total:₹{{total}}</h4>
     <div class="text-center mt-3">
-        <button type="submit" class="btn btn-success">Place Order</button>
+        <!-- <button type="submit" class="btn btn-success">Place Order</button> -->
+         <a href="{% url 'placeorder' %}" class="btn btn-success">Place Order</a>
         <a href="{% url 'showcart' %}" class="btn btn-danger">Cencel</a>
     </div>
     </form>

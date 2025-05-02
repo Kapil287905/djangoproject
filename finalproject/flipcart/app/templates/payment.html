@@ -1,0 +1,22 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Filpkart|PlaceOrder {% endblock %} 
+{% block body %}
+<div class="container">
+    <h2 class="mb-3 text-center">Order Summary</h2>
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><Strong>Customer Name: </Strong>{{profile.userid}}</p>
+            <p><Strong>Email: </Strong>{{profile.userid.email}}</p>
+            <p><Strong>Mobile: </Strong>{{profile.mobile}}</p>
+            <p><Strong>Address: </Strong>{{address.address}}</p>
+            <p><Strong>City: </Strong>{{address.city.name}}</p>
+            <p><Strong>Country: </Strong>{{address.country.name}}</p>
+            <p><Strong>Pincode: </Strong>{{address.pincode}}</p> 
+        </div>
+        <h2>Total Payment: {{total}}</h2>
+    </div>
+    <a href="#" class="btn btn-danger">Pay Now</a>
+</div>
+
+{% endblock %}
