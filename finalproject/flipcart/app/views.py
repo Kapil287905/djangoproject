@@ -562,7 +562,7 @@ def checkout(req):
     
     cart_item=Carts.objects.filter(userid=req.user)
     if not cart_item.exists():
-        return redirect('showcarts')
+        return redirect('showcart')
     
     cartdata=[]
     total= 0
@@ -577,7 +577,7 @@ def checkout(req):
             }
         )
     
-        total+=subtotalp
+        total+=subtotal
 
     req.session["total"] = total
     profile=UserProfile.objects.filter(userid=req.user).first()
@@ -602,6 +602,7 @@ def checkoutsingle(req,productid):
     cartitem=Carts.objects.get(userid=user,productid__productid=productid)
     cartdata=[
         {
+            "productid": cartitem.productid.productid,  # <-- Add this
             'productname':cartitem.productid.productname,
             'qty':cartitem.qty,
             'price': cartitem.productid.price,
@@ -626,10 +627,62 @@ def checkoutsingle(req,productid):
         },
     )
 
+import razorpay
+from django.conf import settings
+
 def placeorder(req):
-    user=req.user
-    profile=UserProfile.objects.filter(userid=req.user).first()
-    address=Address.objects.filter(userid=req.user)
-    print(address)
-    total=req.session['total']
-    return render(req,"payment.html",{"profile":profile,"address":address,"total":total})
+    if req.method=="POST":
+        user=req.user
+        address_id=req.POST["address_id"]
+        address=get_object_or_404(Address,id=address_id,userid=user)
+        profile=UserProfile.objects.filter(userid=user).first()
+        product_id = req.POST.get("product_id")
+        print(product_id)
+        cartdata=[]
+        total=0
+        if product_id:
+            cart_items = get_object_or_404(Carts, userid=user, productid__productid=product_id)
+            print(cart_items)           
+            subtotal = cart_items.qty * cart_items.productid.price
+            total += subtotal
+            cartdata.append({
+                
+                "productname": cart_items.productid.productname,
+                "qty": cart_items.qty,
+                "price": cart_items.productid.price,
+                "subtotal": subtotal,
+            })
+        else:
+            cart_items = Carts.objects.filter(userid=user)
+            for item in cart_items:
+                subtotal = item.qty * item.productid.price
+                total += subtotal
+                cartdata.append({
+                    "productname": item.productid.productname,
+                    "qty": item.qty,
+                    "price": item.productid.price,
+                    "subtotal": subtotal,
+                })
+        
+        amount_paise=total*100
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        razorpay_order=client.order.create(
+            {
+                'amount':amount_paise,
+                'currency':"INR",
+                'payment_capture':1
+            }
+        )
+
+        return render(req,'payment.html',
+                      {
+                       'profile':profile,
+                       'address':address,
+                       'cartdata':cartdata,
+                       'total':total,
+                       'razorpay_key':settings.RAZORPAY_KEY_ID,
+                       'order_id':razorpay_order['id'],
+                       'amount':amount_paise,
+                       'user':user
+                      })
+    return redirect('checkout')

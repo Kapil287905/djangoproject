@@ -112,7 +112,7 @@ class Wishlist(models.Model):
 class Orders(models.Model):
     PAYMENT_STATUS_CHOICES = (
         ("PENDING", "PENDING"),
-        ("PAID", "PENDING"),
+        ("PAID", "PAID"),
         ("FAILED", "FAILED"),
         ("REFUNDED", "REFUNDED"),
     )

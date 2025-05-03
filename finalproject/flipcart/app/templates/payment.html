@@ -1,22 +1,123 @@
-{% extends 'base.html' %} 
-{% load static %} 
-{% block title %}Filpkart|PlaceOrder {% endblock %} 
+{% extends 'base.html' %}
+{% block title %}FlipKart | Place Order{% endblock %}
 {% block body %}
-<div class="container">
-    <h2 class="mb-3 text-center">Order Summary</h2>
-    <div class="card mb-3">
-        <div class="card-body">
-            <p><Strong>Customer Name: </Strong>{{profile.userid}}</p>
-            <p><Strong>Email: </Strong>{{profile.userid.email}}</p>
-            <p><Strong>Mobile: </Strong>{{profile.mobile}}</p>
-            <p><Strong>Address: </Strong>{{address_id.address}}</p>
-            <p><Strong>City: </Strong>{{address.city.name}}</p>
-            <p><Strong>Country: </Strong>{{address.country.name}}</p>
-            <p><Strong>Pincode: </Strong>{{address.pincode}}</p> 
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Order Summary Header -->
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">🛒 Review Your Order</h2>
+                <p class="text-muted">Please verify your details before proceeding to payment.</p>
+            </div>
+
+            <!-- Customer & Address Info -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <strong>Customer & Shipping Information</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> {{ profile.userid }}</p>
+                            <p><strong>Email:</strong> {{ profile.userid.email }}</p>
+                            <p><strong>Mobile:</strong> {{ profile.mobile }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Address:</strong> {{ address.address }}</p>
+                            <p><strong>City:</strong> {{ address.city.name }}</p>
+                            <p><strong>Country:</strong> {{ address.country.name }}</p>
+                            <p><strong>Pincode:</strong> {{ address.pincode }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Items -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <strong>Products in Your Cart</strong>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cartdata %}
+                                <tr>
+                                    <td>{{ item.productname }}</td>
+                                    <td>{{ item.qty }}</td>
+                                    <td>₹{{ item.price }}</td>
+                                    <td><strong>₹{{ item.subtotal }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total & Pay Button -->
+            <div class="d-flex justify-content-between align-items-center">
+                <h4>Total Amount: <span class="text-success">₹{{ total }}</span></h4>
+                <!-- <a href="#" class="btn btn-success btn-lg px-5">💳 Pay Now</a> -->
+                <div class="text-center mt-4">
+                    <button id="rzp-button" class="btn btn-success btn-lg">💳 Pay Now</button>
+                </div>
+            </div>
         </div>
-        <h2>Total Payment: {{total}}</h2>
     </div>
-    <a href="#" class="btn btn-danger">Pay Now</a>
 </div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "{{razorpay_key}}", // Enter the Key ID generated from the Dashboard
+    "amount": "{{amount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "flipcart",
+    "description": "Purchase",
+    "image": "https://example.com/your_logo",
+    "order_id": "{{order_id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+        // alert(response.razorpay_payment_id);
+        // alert(response.razorpay_order_id);
+        // alert(response.razorpay_signature)
+        alert("Payment successfully Done!!")
+        window.location.href="/"
+    },
+    "prefill": {
+        "name": "Gaurav Kumar",
+        "email": "gaurav.kumar@example.com",
+        "contact": "9000090000"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+document.getElementById('rzp-button').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
 
 {% endblock %}
