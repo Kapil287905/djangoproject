@@ -686,3 +686,118 @@ def placeorder(req):
                        'user':user
                       })
     return redirect('checkout')
+
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+from datetime import date
+from .models import Orders, Payments, Carts
+
+
+from razorpay.errors import SignatureVerificationError
+
+@csrf_exempt
+def payment(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            print("Parsed data:", data)
+
+            # Extract values from payload
+            payment_id = data.get("razorpay_payment_id")
+            order_id = data.get("razorpay_order_id")
+            razorpay_signature = data.get("razorpay_signature")  # ✅ Define it here
+
+            if not all([payment_id, order_id, razorpay_signature]):
+                return JsonResponse({"status": "missing_data"}, status=400)
+
+            # Set up Razorpay client and verify signature
+            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+            params_dict = {
+                'razorpay_order_id': order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': razorpay_signature
+            }
+
+            try:
+                # Verify signature
+                client.utility.verify_payment_signature(params_dict)
+                user = request.user
+                profile = UserProfile.objects.get(userid=user)
+                address = Address.objects.filter(userid=user).first()
+                cart_items = Carts.objects.filter(userid=user)
+                print(cart_items)
+
+                for item in cart_items:
+                    order = Orders.objects.create(
+                        userid=user,
+                        productid=item.productid,
+                        qty=item.qty,
+                        orderdate=datetime.now(),
+                        address=address,
+                        payment_status="PAID"
+                    )
+                    Payments.objects.create(
+                        orderid=order,
+                        userid=user,
+                        productid=item.productid,
+                        payment_mode="Online",
+                        payment_status="DONE"
+                    )
+                request.session['order_id'] = order_id
+                request.session['payment_id'] = payment_id
+                request.session['amount'] = client.order.fetch(order_id)['amount']
+                cart_items.delete()
+
+                # return redirect('payment_success')
+                return JsonResponse({"status": "success", "redirect_url": "/payment_success/"})
+                # return redirect(f'/payment_success/?order_id={order_id}&payment_id={payment_id}&amount={amount}')
+
+            except SignatureVerificationError:
+                return JsonResponse({"status": "invalid_signature"}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "invalid_json"}, status=400)
+
+    return JsonResponse({"status": "invalid_method"}, status=405)
+
+
+def payment_success(req):
+    order_id = req.session.get('order_id')
+    payment_id = req.session.get('payment_id')
+    amount = req.session.get('amount')
+
+    user = req.user
+
+    return render(req, 'payment_success.html', {
+        'order_id': order_id,
+        'payment_id': payment_id,
+        'amount': float(amount) / 100,  # convert paise to INR
+        'user': user
+    })
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Orders
+
+def showorders(request):
+    user = request.user
+    orders = Orders.objects.filter(userid=user).select_related('productid', 'address').order_by('-orderdate')
+
+    # Add total price and payment details to each order
+    for order in orders:
+        order.total_price = order.qty * order.productid.price
+        # Fetch related payment information (assuming 1-to-1 relation between Orders and Payments)
+        payment = Payments.objects.filter(orderid=order).first()
+        if payment:
+            order.payment_mode = payment.payment_mode
+            order.payment_status = payment.payment_status
+        else:
+            order.payment_mode = "Not Available"
+            order.payment_status = "Not Paid"
+
+    return render(request, 'showorders.html', {
+        'orders': orders
+    })
